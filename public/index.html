@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>男女统计图</title>
+	<link rel="stylesheet" href="stylesheets/style.css">
+	<script src="javascripts/jquery-3.1.1.min.js"></script>
+	<script src="javascripts/Chart.min.js"></script>
+</head>
+<body>
+	<div class="box">
+		<canvas id="myChart"></canvas>
+	</div>
+</body>
+<script>
+	var C_url="http://localhost:8000/users/users";
+	var arr=[];
+//女生
+	var nv_o=0, //0-18	
+		nv_t=0, //19-30
+		nv_s=0, //31-50
+		nv_f=0; //50以上
+//男生
+	var	nan_o=0,   //0-18	
+		nan_t=0,   //19-30
+		nan_s=0,   //31-50
+		nan_f=0;   //50以上
+	$.ajax({
+		url:C_url,
+		type:"get",
+		success:function(data){
+			arr=data;
+			for(var i=0;i<arr.length;i++){
+				var age=arr[i].ages;
+				//console.log(age)
+				if(arr[i].gender=='男'){
+					if(age>0&&age<=18){
+						nan_o++;
+					}else if(age>18&&age<=30){
+						nan_t++;
+					}else if(age>30&&age<=50){
+						nan_s++;
+					}else{
+						nan_f++;
+					}
+				}else if(arr[i].gender=='女'){
+					if(age>0&&age<=18){
+						nv_o++;
+					}else if(age>18&&age<=30){
+						nv_t++;
+					}else if(age>30&&age<=50){
+						nv_s++;
+					}else{
+						nv_f++;
+					}
+				}
+			}
+			var ctx = document.getElementById("myChart");
+			var BarChart = {  
+			    labels: ["0-18", "19-30", "31-50", "50以上"],  
+			    scaleSteps : 15,        //y轴刻度的个数
+                scaleStepWidth : 300,   //y轴每个刻度的宽度
+			    datasets: [{  
+		    		label: "男",
+		            backgroundColor: "#000",  
+		            strokeColor: "rgba(255,255,255,1)",
+		            data: [nan_o,nan_t,nan_s,nan_f]
+		        },{  
+		        	label: "女",
+		            backgroundColor: "red",  
+		            strokeColor: "rgba(255,255,255,1)",  
+		            data: [nv_o,nv_t,nv_s,nv_f]
+		        }]  
+			};
+			var tit={
+				elements:{
+					line:{
+						tension:0.4,
+					},
+					point:{
+						radius:2,
+					}
+				},
+				title:{
+					display: true,
+					fontColor:"#000",  		
+					text:'信用前二十名 男女 年龄人数信息统计图',
+					fontSize:24
+				}
+			}
+			var myChart = new Chart(ctx,{type:"bar",data:BarChart,options:tit})
+		}
+	})
+</script>
+</html>
